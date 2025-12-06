@@ -1,0 +1,44 @@
+{
+  "appetizers": [
+    {
+      "name": "Crispy Calamari",
+      "description": "Lightly breaded and fried calamari, served with a spicy marinara sauce.",
+      "price": 12.99,
+      "dietary": ["contains_gluten", "contains_shellfish"]
+    },
+    {
+      "name": "Bruschetta",
+      "description": "Toasted baguette topped with fresh tomatoes, garlic, basil, and a balsamic glaze.",
+      "price": 9.99,
+      "dietary": ["vegetarian", "contains_gluten"]
+    }
+  ],
+  "mains": [
+    {
+      "name": "Margherita Pizza",
+      "description": "Classic pizza with a San Marzano tomato sauce, fresh mozzarella, basil, and a drizzle of olive oil.",
+      "price": 15.99,
+      "dietary": ["vegetarian", "contains_gluten", "contains_dairy"]
+    },
+    {
+      "name": "Grilled Salmon",
+      "description": "Perfectly grilled salmon fillet served with roasted asparagus and a lemon-dill sauce.",
+      "price": 22.99,
+      "dietary": ["gluten_free"]
+    }
+  ],
+  "drinks": [
+    {
+      "name": "Red Wine",
+      "description": "A full-bodied Cabernet Sauvignon.",
+      "price": 8.99,
+      "pairings": ["Margherita Pizza"]
+    },
+    {
+      "name": "Craft Beer",
+      "description": "A hoppy IPA from a local brewery.",
+      "price": 6.99,
+      "pairings": ["Crispy Calamari"]
+    }
+  ]
+}
