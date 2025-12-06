@@ -1,4 +1,5 @@
 import json
+import os
 
 class ChefMAX:
     def __init__(self, menu_file, restaurant_name="The Golden Spoon"):
@@ -10,7 +11,9 @@ class ChefMAX:
     def load_menu(self, menu_file):
         """Loads the menu from a JSON file."""
         try:
-            with open(menu_file, 'r') as f:
+            # Get the directory of the agent.py file
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            with open(os.path.join(dir_path, menu_file), 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
             return {}
@@ -86,19 +89,3 @@ class ChefMAX:
 
         else:
             return "I'm still learning. How about we start over?"
-
-def main():
-    """A simple command-line interface for ChefMAX."""
-    agent = ChefMAX("chefmax_agent/menu.json")
-    print(agent.greet())
-
-    while True:
-        user_input = input("> ")
-        if user_input.lower() in ["exit", "quit"]:
-            print("Thank you for visiting!")
-            break
-        response = agent.handle_input(user_input)
-        print(response)
-
-if __name__ == "__main__":
-    main()
