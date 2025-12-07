@@ -4,13 +4,15 @@
       "name": "Crispy Calamari",
       "description": "Lightly breaded and fried calamari, served with a spicy marinara sauce.",
       "price": 12.99,
-      "dietary": ["contains_gluten", "contains_shellfish"]
+      "dietary": ["contains_gluten", "contains_shellfish"],
+      "type": "appetizer"
     },
     {
       "name": "Bruschetta",
       "description": "Toasted baguette topped with fresh tomatoes, garlic, basil, and a balsamic glaze.",
       "price": 9.99,
-      "dietary": ["vegetarian", "contains_gluten"]
+      "dietary": ["vegetarian", "contains_gluten"],
+      "type": "appetizer"
     }
   ],
   "mains": [
@@ -18,13 +20,29 @@
       "name": "Margherita Pizza",
       "description": "Classic pizza with a San Marzano tomato sauce, fresh mozzarella, basil, and a drizzle of olive oil.",
       "price": 15.99,
-      "dietary": ["vegetarian", "contains_gluten", "contains_dairy"]
+      "dietary": ["vegetarian", "contains_gluten", "contains_dairy"],
+      "type": "pizza",
+      "questions": [
+        "Would you like any additional toppings?",
+        "Thin or regular crust?"
+      ]
     },
     {
       "name": "Grilled Salmon",
       "description": "Perfectly grilled salmon fillet served with roasted asparagus and a lemon-dill sauce.",
       "price": 22.99,
-      "dietary": ["gluten_free"]
+      "dietary": ["gluten_free"],
+      "type": "seafood"
+    },
+    {
+      "name": "New York Strip",
+      "description": "A 12oz New York Strip steak, grilled to perfection and served with a side of mashed potatoes.",
+      "price": 32.99,
+      "dietary": [],
+      "type": "steak",
+      "questions": [
+        "How would you like that cooked? (rare/medium rare/medium/medium well/well)"
+      ]
     }
   ],
   "drinks": [
@@ -32,7 +50,7 @@
       "name": "Red Wine",
       "description": "A full-bodied Cabernet Sauvignon.",
       "price": 8.99,
-      "pairings": ["Margherita Pizza"]
+      "pairings": ["Margherita Pizza", "New York Strip"]
     },
     {
       "name": "Craft Beer",
