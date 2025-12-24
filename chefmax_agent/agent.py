@@ -1,28 +1,36 @@
 import json
 import os
+import random
 import streamlit as st
 
 class ChefMAX:
-    def __init__(self, menu_file, restaurant_name="The Golden Spoon"):
+    def __init__(self, menu_file, questions_file, restaurant_name="The Golden Spoon"):
         self.restaurant_name = restaurant_name
-        self.menu = self.load_menu(menu_file)
+        self.menu = self.load_json(menu_file)
+        self.questions = self.load_json(questions_file)
         self.order = []
-        self.conversation_state = "GATHERING_PARTY_DETAILS"
+        self.conversation_state = "GREETING"
         self.current_item = None
 
-    def load_menu(self, menu_file):
-        """Loads the menu from a JSON file."""
+    def load_json(self, file_path):
+        """Loads data from a JSON file."""
         try:
             dir_path = os.path.dirname(os.path.realpath(__file__))
-            with open(os.path.join(dir_path, menu_file), 'r') as f:
+            with open(os.path.join(dir_path, file_path), 'r') as f:
                 return json.load(f)
         except FileNotFoundError:
             return {}
 
     def greet(self):
         """Greets the customer and asks about their party size."""
-        self.conversation_state = "GATHERING_PARTY_DETAILS"
-        return f"Welcome to {self.restaurant_name}! How many in your party today?"
+        self.conversation_state = "GREETING"
+        return f"Welcome to {self.restaurant_name}! {self._get_question('ARRIVAL & SEATING')}"
+
+    def _get_question(self, category):
+        """Gets a random question from the specified category."""
+        if category in self.questions and self.questions[category]:
+            return random.choice(self.questions[category])
+        return "What else can I get for you?"
 
     def _find_item(self, item_name):
         """Finds an item in the menu by name."""
@@ -35,81 +43,98 @@ class ChefMAX:
     def _format_order(self):
         if not self.order:
             return "You haven't ordered anything yet."
-
         formatted_order = "Here is your order so far:\n"
         for item in self.order:
             formatted_order += f"- {item['name']}"
-            if item["mods"]:
+            if item.get("mods"):
                 formatted_order += f" ({', '.join(item['mods'])})\n"
             else:
                 formatted_order += "\n"
         return formatted_order
 
     def handle_input(self, user_input):
-        """Handles the user's input based on the conversation state."""
+        """Handles the user's input based on a more flexible conversation state."""
         user_input = user_input.lower()
+        response = ""
 
-        if self.conversation_state == "GATHERING_PARTY_DETAILS":
-            self.conversation_state = "TAKING_DRINK_ORDER"
-            return "Excellent. Can I start you with something to drink? We have a great selection of red wine and craft beer."
-
-        elif self.conversation_state == "TAKING_DRINK_ORDER":
+        if self.conversation_state == "GREETING":
+            # Acknowledge the user's response and ask about allergies.
             self.conversation_state = "ALLERGY_CHECK"
-            return "Great choice. Now, before we move on to the food, does anyone in your party have any food allergies or dietary restrictions I should inform the chef about?"
+            response = f"Perfect, thank you. {self._get_question('ALLERGY_CHECK')}"
 
         elif self.conversation_state == "ALLERGY_CHECK":
-            self.conversation_state = "MENU_INTRODUCTION"
-            return "Thank you for letting me know. Are you familiar with our menu, or shall I highlight some favorites?"
+            # Acknowledge the allergy information and ask for drinks/starters.
+            self.conversation_state = "TAKING_ORDER"
+            response = f"Thank you for letting me know. {self._get_question('DRINKS & STARTERS')}"
 
-        elif self.conversation_state == "MENU_INTRODUCTION":
+        elif self.conversation_state == "TAKING_ORDER":
             if "that's all" in user_input or "that is all" in user_input:
-                self.conversation_state = "CONFIRM_ORDER"
-                return self._format_order() + "\nDoes that complete your order, or would you like to add anything else?"
-
-            item = self._find_item(user_input)
-            if item:
-                self.current_item = item
-                self.order.append({"name": item["name"], "mods": []})
-                if "questions" in item and item["questions"]:
-                    self.conversation_state = "ITEM_CUSTOMIZATION"
-                    return item["questions"][0]
+                if not self.order:
+                    response = "Of course. Are you ready to order your main course whenever you are?"
                 else:
-                    self.conversation_state = "CONFIRM_ADD_ITEM"
-                    return f"Excellent choice. The {item['name']} is superb. Would you like to add that to your order?"
+                    self.conversation_state = "CONFIRMING_ORDER"
+                    response = self._format_order() + "\nDoes this look correct?"
             else:
-                return "I'm sorry, I couldn't find that item. Our most popular dishes are the Margherita Pizza and the New York Strip."
+                item = self._find_item(user_input)
+                if item:
+                    self.current_item = item
+                    self.order.append({"name": item["name"], "mods": []})
+                    if item.get("questions"):
+                        self.conversation_state = "CUSTOMIZING_ITEM"
+                        response = item["questions"][0]
+                    else:
+                        self.conversation_state = "CONFIRMING_ITEM_ADD"
+                        response = f"Excellent choice. The {item['name']} is superb. Would you like to add that to your order?"
+                else:
+                    response = f"I'm sorry, I couldn't find '{user_input}' on the menu. {self._get_question('MAIN ORDER')}"
 
-        elif self.conversation_state == "ITEM_CUSTOMIZATION":
+        elif self.conversation_state == "CUSTOMIZING_ITEM":
             self.order[-1]["mods"].append(user_input)
             current_question_index = len(self.order[-1]["mods"])
-            if current_question_index < len(self.current_item["questions"]):
-                return self.current_item["questions"][current_question_index]
+            if self.current_item and current_question_index < len(self.current_item.get("questions", [])):
+                response = self.current_item["questions"][current_question_index]
             else:
-                 self.conversation_state = "CONFIRM_ADD_ITEM"
-                 return f"Got it. So that's the {self.current_item['name']} with {', '.join(self.order[-1]['mods'])}. Shall I add that to your order?"
+                self.conversation_state = "CONFIRMING_ITEM_ADD"
+                mods = ', '.join(self.order[-1]['mods'])
+                response = f"Got it. So that's the {self.current_item['name']} with {mods}. Shall I add that to your order?"
 
-        elif self.conversation_state == "CONFIRM_ADD_ITEM":
-             if "yes" in user_input:
-                self.conversation_state = "MENU_INTRODUCTION"
-                return "Item added. What else can I get for you? (Say 'that's all' to finish your order)"
-             else:
+        elif self.conversation_state == "CONFIRMING_ITEM_ADD":
+            if "yes" in user_input:
+                self.conversation_state = "TAKING_ORDER"
+                response = f"Item added. {self._get_question('MAIN ORDER')}"
+            else:
                 self.order.pop()
-                self.conversation_state = "MENU_INTRODUCTION"
-                return "No problem. Let's try something else."
+                self.conversation_state = "TAKING_ORDER"
+                response = f"No problem. Let's try something else. What can I get for you?"
 
-        elif self.conversation_state == "CONFIRM_ORDER":
+        elif self.conversation_state == "CONFIRMING_ORDER":
             if "yes" in user_input or "that's correct" in user_input:
-                self.conversation_state = "CLOSING"
-                return "Excellent. Would you like to see our dessert menu?"
+                self.conversation_state = "ORDER_COMPLETE"
+                response = f"Excellent. I'll get that order in. {self._get_question('MEAL SERVICE')}"
             else:
-                self.conversation_state = "MENU_INTRODUCTION"
-                return "My apologies. Let's correct that. What would you like to change?"
+                # For simplicity, we'll restart the order if it's wrong.
+                self.order = []
+                self.conversation_state = "TAKING_ORDER"
+                response = "My apologies. Let's correct that. What would you like to order?"
 
-        elif self.conversation_state == "CLOSING":
-            return "Thank you for your order! It will be ready shortly."
+        elif self.conversation_state == "ORDER_COMPLETE":
+            self.conversation_state = "DESSERT"
+            response = self._get_question("DESSERT & AFTER")
+
+        elif self.conversation_state == "DESSERT":
+            self.conversation_state = "PAYMENT"
+            response = self._get_question("PAYMENT & CLOSING")
+
+        elif self.conversation_state == "PAYMENT":
+            self.conversation_state = "END"
+            response = "Thank you for dining with us! Have a wonderful day."
 
         else:
-            return "I'm still learning. How about we start over?"
+            # Fallback for any unknown state
+            self.conversation_state = "GREETING"
+            response = "I seem to have gotten confused. Let's start over. Welcome!"
+
+        return response
 
 
 st.set_page_config(page_title="ChefMAX - Your Personal Dining Assistant")
@@ -117,7 +142,7 @@ st.title("ChefMAX - Your Personal Dining Assistant")
 
 # Initialize the agent and conversation history in the session state
 if 'agent' not in st.session_state:
-    st.session_state.agent = ChefMAX(menu_file="menu.json")
+    st.session_state.agent = ChefMAX(menu_file="menu.json", questions_file="questions.json")
     st.session_state.messages = []
     # Start the conversation with the agent's greeting
     greeting = st.session_state.agent.greet()

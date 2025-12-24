@@ -1,0 +1,43 @@
+{
+  "ARRIVAL & SEATING": [
+    "Do you have a reservation today?",
+    "Under what name is the booking?",
+    "How many people are in your party?",
+    "Would you prefer indoor or outdoor seating?",
+    "May I take your coats?"
+  ],
+  "DRINKS & STARTERS": [
+    "Can I get you something to drink to start?",
+    "Still or sparkling water?",
+    "Would you like to see the wine/cocktail list?",
+    "Are you interested in any appetizers while you decide?",
+    "Would you like me to explain today's specials?"
+  ],
+  "MAIN ORDER": [
+    "Are you ready to order, or should I come back?",
+    "Would you like a starter/first course?"
+  ],
+  "ALLERGY_CHECK": [
+    "Does anyone have allergies or dietary restrictions?"
+  ],
+  "MEAL SERVICE": [
+    "Is everything tasting good?",
+    "Can I get you another drink?",
+    "Would you like more bread/water?",
+    "How is that dish for you?",
+    "Would you like extra sauce/dressing?"
+  ],
+  "DESSERT & AFTER": [
+    "Did you save room for dessert?",
+    "Can I show you the dessert menu?",
+    "Would you like coffee or tea with that?",
+    "Interested in a digestif? We have [local spirit]."
+  ],
+  "PAYMENT & CLOSING": [
+    "Was everything satisfactory?",
+    "Shall I bring the bill together or separately?",
+    "Cash or card payment?",
+    "Would you like the receipt?",
+    "Could I get your feedback on today's experience?"
+  ]
+}
