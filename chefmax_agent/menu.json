@@ -24,7 +24,8 @@
       "type": "pizza",
       "questions": [
         "Would you like any additional toppings?",
-        "Thin or regular crust?"
+        "Thin or regular crust?",
+        "Would you like to make that a combo meal?"
       ]
     },
     {
@@ -32,7 +33,10 @@
       "description": "Perfectly grilled salmon fillet served with roasted asparagus and a lemon-dill sauce.",
       "price": 22.99,
       "dietary": ["gluten_free"],
-      "type": "seafood"
+      "type": "seafood",
+      "questions": [
+        "Would you like any sides with that?"
+      ]
     },
     {
       "name": "New York Strip",
@@ -41,7 +45,8 @@
       "dietary": [],
       "type": "steak",
       "questions": [
-        "How would you like that cooked? (rare/medium rare/medium/medium well/well)"
+        "How would you like that cooked? (rare/medium rare/medium/medium well/well)",
+        "Would you like any sides with that?"
       ]
     }
   ],
